@@ -1,14 +1,14 @@
 {
   "id": "thiscovery-editor",
   "name": "Thiscovery Editor",
-  "description": "Thiscovery-owned Lexical rich-text editor with callout, survey, accordion, and button blocks. Used by the page builder.",
-  "keywords": [
-    "thiscovery",
-    "editor",
-    "lexical",
-    "richtext"
-  ],
-  "version": "1.0.0",
+    "description": "Thiscovery-owned Lexical rich-text editor with tables, images, callout, survey, accordion, and button blocks. Used by the page builder.",
+    "keywords": [
+        "thiscovery",
+        "editor",
+        "lexical",
+        "richtext"
+    ],
+    "version": "1.1.0",
   "humhub": {
     "minVersion": "1.18"
   },

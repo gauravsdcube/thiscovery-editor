@@ -10,10 +10,13 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { ListNode, ListItemNode } from '@lexical/list';
 import { LinkNode, AutoLinkNode } from '@lexical/link';
+import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
+import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import { CalloutNode } from './nodes/CalloutNode.jsx';
 import { AccordionNode } from './nodes/AccordionNode.jsx';
 import { SurveyNode } from './nodes/SurveyNode.jsx';
 import { ButtonNode } from './nodes/ButtonNode.jsx';
+import { ImageNode } from './nodes/ImageNode.jsx';
 import { RawHtmlNode } from './nodes/RawHtmlNode.jsx';
 import Toolbar from './Toolbar.jsx';
 import HtmlImportPlugin from './plugins/HtmlImportPlugin.jsx';
@@ -28,6 +31,12 @@ const theme = {
   list: { ul: 'te-ul', ol: 'te-ol', listitem: 'te-li', nested: { listitem: 'te-li' } },
   link: 'te-link',
   text: { bold: 'te-bold', italic: 'te-italic', underline: 'te-underline' },
+  table: 'te-table',
+  tableCell: 'te-td',
+  tableCellHeader: 'te-th',
+  tableRow: 'te-tr',
+  tableSelected: 'te-table-selected',
+  tableCellSelected: 'te-td-selected',
 };
 
 function onError(error) {
@@ -64,6 +73,10 @@ export default function EditorApp({ textarea, height, profile, html, forms, edit
       ListItemNode,
       LinkNode,
       AutoLinkNode,
+      TableNode,
+      TableCellNode,
+      TableRowNode,
+      ImageNode,
       CalloutNode,
       AccordionNode,
       SurveyNode,
@@ -112,6 +125,7 @@ export default function EditorApp({ textarea, height, profile, html, forms, edit
           <HistoryPlugin />
           <ListPlugin />
           <LinkPlugin />
+          <TablePlugin hasCellMerge={false} hasHorizontalScroll />
           <HtmlImportPlugin html={html} />
           <SavePlugin textarea={textarea} htmlMode={htmlMode} />
           <EditorHandle editorRef={editorRef} />

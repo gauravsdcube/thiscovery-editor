@@ -1,6 +1,6 @@
 # Thiscovery Editor
 
-**Version 1.0.0**  
+**Version 1.1.0**  
 **Copyright (c) 2026 D Cube Consulting Ltd. All rights reserved.**  
 **License:** [AGPL-3.0-or-later](LICENSE)
 
@@ -39,9 +39,9 @@ echo EditorField::widget([
 ]);
 ```
 
-`profile=page` includes Callout, Accordion, and Survey insert buttons. Both profiles include a Button insert (label, URL, style). `simple` is otherwise core formatting only.
+`profile=page` includes Callout, Accordion, and Survey insert buttons. Both profiles include Button, **Image** (URL or upload), and **Table** (plus **+ Row** / **+ Col** when the cursor is in a table). `simple` is otherwise core formatting only.
 
-Use the **HTML** toolbar button to edit raw markup. Tables, iframes, and other HTML that is not a native block are kept as HTML blocks. Public pages still sanitise output.
+Use the **HTML** toolbar button to edit raw markup. Iframes and other HTML that is not a native block are kept as HTML blocks. Public pages still sanitise output.
 
 ## JS API
 

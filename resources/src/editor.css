@@ -40,6 +40,34 @@
 .te-italic { font-style: italic; }
 .te-underline { text-decoration: underline; }
 
+.te-table-scroll { overflow-x: auto; margin: 0 0 .75rem; }
+.te-table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  margin: 0;
+}
+.te-td, .te-th {
+  border: 1px solid #d0d5dd;
+  padding: .4rem .55rem;
+  min-width: 4.5rem;
+  vertical-align: top;
+  background: #fff;
+}
+.te-th { background: #f8fafc; font-weight: 600; }
+.te-table-selected { outline: 2px solid #005eb8; }
+.te-td-selected { background: #dbeafe; }
+
+.te-image__preview {
+  margin: 0 0 .5rem; background: #f8fafc; border: 1px solid #e5e7eb;
+  border-radius: 4px; overflow: hidden; text-align: center;
+}
+.te-image__preview img { max-width: 100%; height: auto; display: inline-block; vertical-align: middle; }
+.te-image__row { margin-bottom: .35rem; }
+.te-image__error { color: #b91c1c; font-size: .85rem; margin: .25rem 0 0; }
+.te-image-wrap { margin: 0 0 1rem; }
+.te-image-wrap img { max-width: 100%; height: auto; display: block; }
+
 .te-deco-wrap { margin: .75rem 0; }
 .te-deco {
   border: 1px solid #d0d5dd; border-radius: 8px; padding: .75rem; background: #fff;

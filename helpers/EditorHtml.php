@@ -82,9 +82,16 @@ class EditorHtml
             $definition->addAttribute('iframe', 'allowfullscreen', 'Bool');
             $definition->addAttribute('iframe', 'allow', 'Text');
             $definition->addAttribute('img', 'style', 'Text');
+            $definition->addAttribute('img', 'class', 'Text');
+            $definition->addAttribute('img', 'alt', 'Text');
+            $definition->addAttribute('figure', 'data-te-node', 'Text');
+            $definition->addAttribute('figure', 'class', 'Text');
             $definition->addAttribute('table', 'style', 'Text');
-            $definition->addAttribute('td', 'style', 'Text');
+            $definition->addAttribute('table', 'class', 'Text');
             $definition->addAttribute('th', 'style', 'Text');
+            $definition->addAttribute('th', 'class', 'Text');
+            $definition->addAttribute('td', 'style', 'Text');
+            $definition->addAttribute('td', 'class', 'Text');
             $definition->addAttribute('p', 'style', 'Text');
             $definition->addAttribute('span', 'style', 'Text');
             $definition->addAttribute('div', 'style', 'Text');

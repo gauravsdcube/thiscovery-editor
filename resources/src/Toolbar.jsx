@@ -7,35 +7,64 @@ import {
   REDO_COMMAND,
   UNDO_COMMAND,
   $createParagraphNode,
+  $insertNodes,
 } from 'lexical';
 import { $setBlocksType } from '@lexical/selection';
 import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from '@lexical/rich-text';
 import { INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND } from '@lexical/list';
 import { TOGGLE_LINK_COMMAND } from '@lexical/link';
+import {
+  INSERT_TABLE_COMMAND,
+  $insertTableRowAtSelection,
+  $insertTableColumnAtSelection,
+  $isTableNode,
+  $isTableCellNode,
+} from '@lexical/table';
 import { $createCalloutNode } from './nodes/CalloutNode.jsx';
 import { $createAccordionNode } from './nodes/AccordionNode.jsx';
 import { $createSurveyNode } from './nodes/SurveyNode.jsx';
 import { $createButtonNode } from './nodes/ButtonNode.jsx';
-import { $insertNodes } from 'lexical';
+import { $createImageNode } from './nodes/ImageNode.jsx';
+
+function $selectionInTable() {
+  const selection = $getSelection();
+  if (!$isRangeSelection(selection)) {
+    return false;
+  }
+  let node = selection.anchor.getNode();
+  while (node) {
+    if ($isTableNode(node) || $isTableCellNode(node)) {
+      return true;
+    }
+    node = node.getParent();
+  }
+  return false;
+}
 
 export default function Toolbar({ profile, htmlMode, onToggleHtml }) {
   const [editor] = useLexicalComposerContext();
   const [block, setBlock] = useState('paragraph');
+  const [inTable, setInTable] = useState(false);
   const showBlocks = profile === 'page';
 
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {
         const selection = $getSelection();
+        setInTable($selectionInTable());
         if (!$isRangeSelection(selection)) {
           return;
         }
-        const anchor = selection.anchor.getNode();
-        const element = anchor.getTopLevelElementOrThrow();
-        if ($isHeadingNode(element)) {
-          setBlock(element.getTag());
-        } else {
-          setBlock(element.getType() === 'quote' ? 'quote' : 'paragraph');
+        try {
+          const anchor = selection.anchor.getNode();
+          const element = anchor.getTopLevelElementOrThrow();
+          if ($isHeadingNode(element)) {
+            setBlock(element.getTag());
+          } else {
+            setBlock(element.getType() === 'quote' ? 'quote' : 'paragraph');
+          }
+        } catch (e) {
+          /* selection may sit on a decorator or table chrome */
         }
       });
     });
@@ -88,6 +117,32 @@ export default function Toolbar({ profile, htmlMode, onToggleHtml }) {
     });
   }, [editor]);
 
+  const insertImage = useCallback(() => {
+    editor.update(() => {
+      $insertNodes([$createImageNode('', '')]);
+    });
+  }, [editor]);
+
+  const insertTable = useCallback(() => {
+    editor.dispatchCommand(INSERT_TABLE_COMMAND, {
+      rows: '3',
+      columns: '3',
+      includeHeaders: true,
+    });
+  }, [editor]);
+
+  const addTableRow = useCallback(() => {
+    editor.update(() => {
+      $insertTableRowAtSelection(true);
+    });
+  }, [editor]);
+
+  const addTableColumn = useCallback(() => {
+    editor.update(() => {
+      $insertTableColumnAtSelection(true);
+    });
+  }, [editor]);
+
   return (
     <div className="te-toolbar" role="toolbar">
       <button type="button" onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)} title="Undo" disabled={htmlMode}>Undo</button>
@@ -107,6 +162,10 @@ export default function Toolbar({ profile, htmlMode, onToggleHtml }) {
       <button type="button" onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)} title="Numbered list" disabled={htmlMode}>1. List</button>
       <button type="button" onClick={insertLink} title="Link" disabled={htmlMode}>Link</button>
       <button type="button" onClick={insertButton} title="Insert button" disabled={htmlMode}>Button</button>
+      <button type="button" onClick={insertImage} title="Insert image" disabled={htmlMode}>Image</button>
+      <button type="button" onClick={insertTable} title="Insert table" disabled={htmlMode}>Table</button>
+      <button type="button" onClick={addTableRow} title="Add table row" disabled={htmlMode || !inTable}>+ Row</button>
+      <button type="button" onClick={addTableColumn} title="Add table column" disabled={htmlMode || !inTable}>+ Col</button>
       {showBlocks && (
         <>
           <span className="te-toolbar__sep" />

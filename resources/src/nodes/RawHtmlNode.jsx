@@ -83,10 +83,14 @@ export class RawHtmlNode extends DecoratorNode {
 
   static importDOM() {
     return {
-      table: () => ({ conversion: convertElement, priority: 3 }),
       iframe: () => ({ conversion: convertElement, priority: 3 }),
       video: () => ({ conversion: convertElement, priority: 3 }),
-      figure: () => ({ conversion: convertElement, priority: 3 }),
+      figure: (domNode) => {
+        if (domNode.getAttribute('data-te-node') === 'image' || domNode.querySelector('img')) {
+          return null;
+        }
+        return { conversion: convertElement, priority: 3 };
+      },
       pre: () => ({ conversion: convertElement, priority: 2 }),
       div: (domNode) => {
         if (domNode.getAttribute('data-te-node') !== 'html') {
