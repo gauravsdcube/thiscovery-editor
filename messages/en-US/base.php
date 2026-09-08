@@ -7,5 +7,5 @@
 
 return [
     'Thiscovery Editor' => 'Thiscovery Editor',
-    'Lexical editor with tables, images, and Thiscovery callout, survey, accordion, and button blocks.' => 'Lexical editor with tables, images, and Thiscovery callout, survey, accordion, and button blocks.',
+    'Lexical editor with formatting, tables, images, and Thiscovery callout, survey, accordion, and button blocks.' => 'Lexical editor with formatting, tables, images, and Thiscovery callout, survey, accordion, and button blocks.',
 ];

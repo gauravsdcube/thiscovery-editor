@@ -1,6 +1,6 @@
 {
   "name": "thiscovery-editor",
-  "version": "1.1.0",
+    "version": "1.4.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,9 +8,11 @@
     "watch": "vite build --watch"
   },
   "dependencies": {
+    "@lexical/code": "^0.35.0",
     "@lexical/html": "^0.35.0",
     "@lexical/link": "^0.35.0",
     "@lexical/list": "^0.35.0",
+    "@lexical/markdown": "^0.35.0",
     "@lexical/react": "^0.35.0",
     "@lexical/rich-text": "^0.35.0",
     "@lexical/selection": "^0.35.0",

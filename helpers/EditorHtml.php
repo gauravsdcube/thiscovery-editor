@@ -23,7 +23,7 @@ class EditorHtml
     public static function looksLikeHtml(string $content): bool
     {
         return (bool) preg_match(
-            '/<\/?(p|div|h[1-6]|ul|ol|li|table|thead|tbody|tr|td|th|strong|em|br|a|span|img|blockquote|figure|iframe|pre|code|aside|section|details|summary)(\s|\/|>)/i',
+            '/<\/?(p|div|h[1-6]|ul|ol|li|table|thead|tbody|tr|td|th|strong|em|br|a|span|img|blockquote|figure|iframe|pre|code|hr|sub|sup|mark|aside|section|details|summary)(\s|\/|>)/i',
             $content
         );
     }
@@ -66,8 +66,12 @@ class EditorHtml
 
     public static function purify(string $html): string
     {
+        $html = self::normaliseIndentStyles($html);
+
         return HtmlPurifier::process($html, static function ($config): void {
             /* @var \HTMLPurifier_Config $config */
+            $config->set('HTML.DefinitionID', 'thiscovery-editor');
+            $config->set('HTML.DefinitionRev', 6);
             $config->set('HTML.Attr.Name.UseCDATA', true);
             $config->set('Attr.AllowedFrameTargets', ['_blank']);
             $config->set('Attr.EnableID', true);
@@ -78,7 +82,11 @@ class EditorHtml
                 '%^(https?:)?//(www\.youtube(?:-nocookie)?\.com/embed/|player\.vimeo\.com/video/)%'
             );
 
-            $definition = $config->getHTMLDefinition(true);
+            $definition = $config->maybeGetRawHTMLDefinition();
+            if ($definition === null) {
+                return;
+            }
+
             $definition->addAttribute('iframe', 'allowfullscreen', 'Bool');
             $definition->addAttribute('iframe', 'allow', 'Text');
             $definition->addAttribute('img', 'style', 'Text');
@@ -86,6 +94,7 @@ class EditorHtml
             $definition->addAttribute('img', 'alt', 'Text');
             $definition->addAttribute('figure', 'data-te-node', 'Text');
             $definition->addAttribute('figure', 'class', 'Text');
+            $definition->addAttribute('figure', 'style', 'Text');
             $definition->addAttribute('table', 'style', 'Text');
             $definition->addAttribute('table', 'class', 'Text');
             $definition->addAttribute('th', 'style', 'Text');
@@ -116,7 +125,42 @@ class EditorHtml
             $definition->addAttribute('a', 'class', 'Text');
             $definition->addAttribute('p', 'data-te-node', 'Text');
             $definition->addAttribute('p', 'class', 'Text');
+            $definition->addAttribute('span', 'class', 'Text');
+            if (!isset($definition->info['mark'])) {
+                $definition->addElement('mark', 'Inline', 'Inline', 'Common');
+            }
+            foreach (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'ul', 'ol', 'li', 'code', 'sub', 'sup', 'mark'] as $tag) {
+                $definition->addAttribute($tag, 'style', 'Text');
+                $definition->addAttribute($tag, 'class', 'Text');
+            }
+            $definition->addAttribute('ol', 'start', 'Number');
+            $definition->addAttribute('li', 'value', 'Number');
+            $definition->addAttribute('li', 'role', 'Text');
+            $definition->addAttribute('li', 'tabindex', 'Text');
+            $definition->addAttribute('li', 'aria-checked', 'Enum#true,false');
+            $definition->addAttribute('hr', 'class', 'Text');
+            $definition->addAttribute('pre', 'class', 'Text');
+            $definition->addAttribute('pre', 'style', 'Text');
+            $definition->addAttribute('pre', 'spellcheck', 'Enum#true,false');
+            $definition->addAttribute('pre', 'data-language', 'Text');
+            $definition->addAttribute('pre', 'data-highlight-language', 'Text');
         });
+    }
+
+    /**
+     * Lexical indent uses padding-inline-start: calc(n * 40px), which HtmlPurifier drops.
+     */
+    private static function normaliseIndentStyles(string $html): string
+    {
+        $html = preg_replace_callback(
+            '/padding-inline-start\s*:\s*calc\(\s*(\d+(?:\.\d+)?)\s*\*\s*(\d+(?:\.\d+)?)px\s*\)/i',
+            static function (array $m): string {
+                return 'padding-left: ' . (string) (int) round(((float) $m[1]) * ((float) $m[2])) . 'px';
+            },
+            $html
+        ) ?? $html;
+
+        return preg_replace('/padding-inline-start\s*:/i', 'padding-left:', $html) ?? $html;
     }
 
     /**

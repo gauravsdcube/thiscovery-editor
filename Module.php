@@ -24,7 +24,7 @@ class Module extends \humhub\components\Module
     {
         return Yii::t(
             'ThiscoveryEditorModule.base',
-            'Lexical editor with tables, images, and Thiscovery callout, survey, accordion, and button blocks.'
+            'Lexical editor with formatting, tables, images, and Thiscovery callout, survey, accordion, and button blocks.'
         );
     }
 }

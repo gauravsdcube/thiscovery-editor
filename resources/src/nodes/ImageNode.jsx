@@ -1,104 +1,65 @@
 import { $getNodeByKey, DecoratorNode } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { useRef, useState } from 'react';
-import { uploadImageFile } from '../upload.js';
+import { useEditorUi } from '../EditorUi.jsx';
 
-function updateNode(editor, nodeKey, mutator) {
-  editor.update(() => {
-    const node = $getNodeByKey(nodeKey);
-    if (node && typeof mutator === 'function') {
-      mutator(node);
-    }
-  });
+function alignFrom(el) {
+  const cls = el.getAttribute('class') || '';
+  if (cls.indexOf('te-image-wrap--left') >= 0 || (el.style && el.style.textAlign === 'left')) {
+    return 'left';
+  }
+  if (cls.indexOf('te-image-wrap--right') >= 0 || (el.style && el.style.textAlign === 'right')) {
+    return 'right';
+  }
+  return 'centre';
 }
 
-function ImageView({ nodeKey, src, alt }) {
-  const [editor] = useLexicalComposerContext();
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const fileRef = useRef(null);
+function widthFrom(img) {
+  return (img && img.style && img.style.width) || '';
+}
 
-  const onPick = async (e) => {
-    const file = e.target.files && e.target.files[0];
-    e.target.value = '';
-    if (!file) {
-      return;
-    }
-    setBusy(true);
-    setError('');
-    try {
-      const url = await uploadImageFile(file);
-      updateNode(editor, nodeKey, (n) => {
-        n.setSrc(url);
-        if (!alt) {
-          n.setAlt(file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' '));
-        }
-      });
-    } catch (err) {
-      setError(err && err.message ? err.message : 'Upload failed.');
-    } finally {
-      setBusy(false);
-    }
-  };
+function ImageView({ nodeKey, src, alt, align, width }) {
+  const [editor] = useLexicalComposerContext();
+  const { open } = useEditorUi();
 
   return (
-    <figure className="te-image te-deco">
+    <figure className={'te-image te-deco te-image--' + (align || 'centre')}>
       <div className="te-deco__bar">
         <span>Image</span>
-        <button
-          type="button"
-          className="te-deco__remove"
-          onClick={() => {
-            editor.update(() => {
-              const node = $getNodeByKey(nodeKey);
-              if (node) {
-                node.remove();
-              }
-            });
-          }}
-        >
-          Remove
-        </button>
+        <span>
+          <button
+            type="button"
+            className="te-deco__add"
+            onClick={() => open('image', { nodeKey, src, alt, align, width })}
+          >
+            Edit
+          </button>{' '}
+          <button
+            type="button"
+            className="te-deco__remove"
+            onClick={() => {
+              editor.update(() => {
+                const node = $getNodeByKey(nodeKey);
+                if (node) {
+                  node.remove();
+                }
+              });
+            }}
+          >
+            Remove
+          </button>
+        </span>
       </div>
       {src ? (
-        <div className="te-image__preview">
-          <img src={src} alt={alt || ''} />
+        <div
+          className="te-image__preview"
+          onClick={() => open('image', { nodeKey, src, alt, align, width })}
+        >
+          <img src={src} alt={alt || ''} style={width ? { width } : undefined} />
         </div>
       ) : (
-        <p className="te-deco__hint">Paste an image URL or upload a file.</p>
+        <p className="te-deco__hint">No image yet. Click Edit to add a URL or upload a file.</p>
       )}
-      <input
-        className="te-deco__title"
-        value={src}
-        placeholder="https://… or /file/file/download?guid=…"
-        onChange={(e) => updateNode(editor, nodeKey, (n) => n.setSrc(e.target.value))}
-        aria-label="Image URL"
-      />
-      <input
-        className="te-deco__title"
-        value={alt}
-        placeholder="Alt text (required for accessibility)"
-        onChange={(e) => updateNode(editor, nodeKey, (n) => n.setAlt(e.target.value))}
-        aria-label="Alt text"
-      />
-      <div className="te-image__row">
-        <button
-          type="button"
-          className="te-deco__add"
-          disabled={busy}
-          onClick={() => fileRef.current && fileRef.current.click()}
-        >
-          {busy ? 'Uploading…' : 'Upload image'}
-        </button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={onPick}
-        />
-      </div>
-      {error ? <p className="te-image__error">{error}</p> : null}
+      {alt ? <p className="te-deco__hint">{alt}</p> : <p className="te-deco__hint">Add alt text in Edit.</p>}
     </figure>
   );
 }
@@ -119,15 +80,17 @@ function altFrom(el, fallbackEl) {
 }
 
 function convertImg(el) {
-  return { node: $createImageNode(srcFrom(el), altFrom(el)) };
+  return { node: $createImageNode(srcFrom(el), altFrom(el), alignFrom(el.parentElement || el), widthFrom(el)) };
 }
 
 function convertFigure(el) {
   const img = el.querySelector('img');
   if (!img) {
-    return { node: $createImageNode('', '') };
+    return { node: $createImageNode('', '', alignFrom(el), '') };
   }
-  return { node: $createImageNode(srcFrom(img), altFrom(img, el.querySelector('figcaption'))) };
+  return {
+    node: $createImageNode(srcFrom(img), altFrom(img, el.querySelector('figcaption')), alignFrom(el), widthFrom(img)),
+  };
 }
 
 export class ImageNode extends DecoratorNode {
@@ -136,13 +99,15 @@ export class ImageNode extends DecoratorNode {
   }
 
   static clone(node) {
-    return new ImageNode(node.__src, node.__alt, node.__key);
+    return new ImageNode(node.__src, node.__alt, node.__align, node.__width, node.__key);
   }
 
-  constructor(src = '', alt = '', key) {
+  constructor(src = '', alt = '', align = 'centre', width = '', key) {
     super(key);
     this.__src = src || '';
     this.__alt = alt || '';
+    this.__align = align || 'centre';
+    this.__width = width || '';
   }
 
   createDOM() {
@@ -156,24 +121,45 @@ export class ImageNode extends DecoratorNode {
   }
 
   decorate() {
-    return <ImageView nodeKey={this.getKey()} src={this.__src} alt={this.__alt} />;
+    return (
+      <ImageView
+        nodeKey={this.getKey()}
+        src={this.__src}
+        alt={this.__alt}
+        align={this.__align}
+        width={this.__width}
+      />
+    );
   }
 
   exportJSON() {
-    return { type: 'te-image', version: 1, src: this.__src, alt: this.__alt };
+    return {
+      type: 'te-image',
+      version: 2,
+      src: this.__src,
+      alt: this.__alt,
+      align: this.__align,
+      width: this.__width,
+    };
   }
 
   static importJSON(json) {
-    return $createImageNode(json.src, json.alt);
+    return $createImageNode(json.src, json.alt, json.align, json.width);
   }
 
   exportDOM() {
     const figure = document.createElement('figure');
     figure.setAttribute('data-te-node', 'image');
-    figure.className = 'te-image-wrap';
+    const align = this.__align || 'centre';
+    figure.className = 'te-image-wrap te-image-wrap--' + align;
+    figure.style.textAlign = align === 'centre' ? 'center' : align;
     const img = document.createElement('img');
     img.setAttribute('src', this.__src || '');
     img.setAttribute('alt', this.__alt || '');
+    if (this.__width) {
+      img.style.width = this.__width;
+    }
+    img.style.maxWidth = '100%';
     figure.append(img);
     return { element: figure };
   }
@@ -199,6 +185,22 @@ export class ImageNode extends DecoratorNode {
     };
   }
 
+  getSrc() {
+    return this.__src;
+  }
+
+  getAlt() {
+    return this.__alt;
+  }
+
+  getAlign() {
+    return this.__align || 'centre';
+  }
+
+  getWidth() {
+    return this.__width || '';
+  }
+
   setSrc(src) {
     const writable = this.getWritable();
     writable.__src = src || '';
@@ -209,13 +211,23 @@ export class ImageNode extends DecoratorNode {
     writable.__alt = alt || '';
   }
 
+  setAlign(align) {
+    const writable = this.getWritable();
+    writable.__align = align || 'centre';
+  }
+
+  setWidth(width) {
+    const writable = this.getWritable();
+    writable.__width = width || '';
+  }
+
   isInline() {
     return false;
   }
 }
 
-export function $createImageNode(src = '', alt = '') {
-  return new ImageNode(src, alt);
+export function $createImageNode(src = '', alt = '', align = 'centre', width = '') {
+  return new ImageNode(src, alt, align, width);
 }
 
 export function $isImageNode(node) {

@@ -91,7 +91,6 @@ export class RawHtmlNode extends DecoratorNode {
         }
         return { conversion: convertElement, priority: 3 };
       },
-      pre: () => ({ conversion: convertElement, priority: 2 }),
       div: (domNode) => {
         if (domNode.getAttribute('data-te-node') !== 'html') {
           return null;

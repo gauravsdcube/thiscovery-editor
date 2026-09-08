@@ -1,5 +1,35 @@
 # Changelog
 
+## 1.4.2 — 2026-09-08
+
+- Enh: Automatically turn typed or pasted URLs (`https://…`, `www.…`) and email addresses into links
+
+## 1.4.1 — 2026-09-08
+
+- Fix: HTML Purifier definition cache warning that Yii treated as a fatal error on public form pages
+
+## 1.4.0 — 2026-09-08
+
+- Enh: Markdown shortcuts while typing (`**bold**`, headings, lists, `---`, fenced code)
+- Enh: Floating format bar on text selection (bold, italic, underline, strike, inline code, link)
+- Enh: Horizontal rule insert (toolbar and `---` / `***`)
+- Enh: Code blocks with language highlighting; Tab indents blocks
+
+## 1.3.0 — 2026-09-08
+
+- Enh: Link dialog (URL, text, new tab) and a floating edit/unlink bar — no browser prompt
+- Enh: Image dialog with upload or URL, alt text, alignment, and width
+- Enh: Table insert dialog (rows, columns, header row)
+- Enh: Table cell menu — insert/delete row and column, merge/unmerge, header row, cell colour, vertical align, delete table
+
+## 1.2.0 — 2026-09-08
+
+- Enh: Grouped icon toolbar with active states (bold, lists, alignment, HTML mode)
+- Enh: Text colour, highlight, font family, and font size
+- Enh: Alignment (left, centre, right, justify), indent / outdent
+- Enh: Strikethrough, subscript, superscript, inline code, and clear formatting
+- Enh: Headings 4–6 and checklists
+
 ## 1.1.0 — 2026-08-22
 
 - Enh: Insert and edit tables from the toolbar (with add row / add column)
