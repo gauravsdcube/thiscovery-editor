@@ -33,6 +33,8 @@ class EditorAsset extends AssetBundle
         'humhub\assets\CoreApiAsset',
     ];
 
+    public $appendTimestamp = true;
+
     public $publishOptions = [
         'forceCopy' => true,
         'except' => [

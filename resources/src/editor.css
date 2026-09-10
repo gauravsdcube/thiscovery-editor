@@ -57,18 +57,19 @@
 .te-pop__custom input { width: 2rem; height: 1.4rem; padding: 0; border: 0; background: none; }
 
 .te-modal {
-  position: absolute; inset: 0; z-index: 60;
-  display: flex; align-items: flex-start; justify-content: center;
-  padding: 2.25rem .75rem .75rem;
+  position: fixed; inset: 0; z-index: 10600;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.25rem;
 }
 .te-modal__backdrop {
   position: absolute; inset: 0; border: 0; padding: 0; margin: 0;
-  background: rgba(15, 23, 42, .35); cursor: pointer;
+  background: rgba(15, 23, 42, .45); cursor: pointer;
 }
 .te-modal__panel {
-  position: relative; z-index: 1; width: min(26rem, 100%);
+  position: relative; z-index: 1; width: min(28rem, 100%);
+  max-height: min(90vh, 42rem); overflow: auto;
   background: #fff; border: 1px solid #d0d5dd; border-radius: 8px;
-  padding: .75rem 1rem;
+  padding: .75rem 1rem; box-shadow: 0 16px 40px rgba(15, 23, 42, .2);
 }
 .te-modal__head {
   display: flex; justify-content: space-between; align-items: center; gap: .5rem;
@@ -192,7 +193,14 @@
   border-radius: 4px; overflow: hidden; text-align: center; cursor: pointer;
 }
 .te-image__preview img { max-width: 100%; height: auto; display: inline-block; vertical-align: middle; }
-.te-image__row { margin-bottom: .35rem; }
+.te-image__row { margin: 0 0 .75rem; }
+.te-image__upload {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 100%; min-height: 2.25rem; font-weight: 600;
+  border-color: #005eb8; color: #005eb8; background: #eff6ff;
+}
+.te-image__upload:hover { background: #dbeafe; }
+.te-image__hint { font-size: .8rem; color: #667085; margin: .4rem 0 0; }
 .te-image__error { color: #b91c1c; font-size: .85rem; margin: .25rem 0 0; }
 .te-image-wrap { margin: 0 0 1rem; }
 .te-image-wrap img { max-width: 100%; height: auto; display: block; }

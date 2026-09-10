@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.3 — 2026-09-10
+
+- Fix: Insert image / link / table dialogs were clipped inside short form editors, hiding **Upload image** and the Insert buttons. Dialogs now open over the page.
+
 ## 1.4.2 — 2026-09-08
 
 - Enh: Automatically turn typed or pasted URLs (`https://…`, `www.…`) and email addresses into links

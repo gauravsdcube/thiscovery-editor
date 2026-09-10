@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 export default function Dialog({ title, onClose, children, footer }) {
   const panelRef = useRef(null);
@@ -10,6 +11,8 @@ export default function Dialog({ title, onClose, children, footer }) {
       }
     };
     document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const first =
       (panelRef.current && panelRef.current.querySelector('.te-modal__body input, .te-modal__body select, .te-modal__body textarea')) ||
       (panelRef.current && panelRef.current.querySelector('input, select, textarea'));
@@ -19,10 +22,13 @@ export default function Dialog({ title, onClose, children, footer }) {
         first.select();
       }
     }
-    return () => document.removeEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
   }, [onClose]);
 
-  return (
+  return createPortal(
     <div className="te-modal" role="dialog" aria-modal="true" aria-label={title}>
       <button type="button" className="te-modal__backdrop" aria-label="Close dialog" onClick={onClose} />
       <div className="te-modal__panel" ref={panelRef}>
@@ -35,6 +41,7 @@ export default function Dialog({ title, onClose, children, footer }) {
         <div className="te-modal__body">{children}</div>
         {footer ? <div className="te-modal__foot">{footer}</div> : null}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

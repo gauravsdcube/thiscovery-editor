@@ -213,6 +213,18 @@ function ImageDialog({ dialog, onClose }) {
             <img src={values.src} alt={values.alt || ''} />
           </div>
         ) : null}
+        <div className="te-image__row">
+          <button
+            type="button"
+            className="te-deco__add te-image__upload"
+            disabled={busy}
+            onClick={() => fileRef.current && fileRef.current.click()}
+          >
+            {busy ? 'Uploading…' : 'Upload image'}
+          </button>
+          <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPick} />
+          <p className="te-image__hint">Or paste an image URL below.</p>
+        </div>
         <label htmlFor="te-image-url">Image URL</label>
         <input
           id="te-image-url"
@@ -255,17 +267,6 @@ function ImageDialog({ dialog, onClose }) {
           <option value="320px">320px</option>
           <option value="480px">480px</option>
         </select>
-        <div className="te-image__row">
-          <button
-            type="button"
-            className="te-deco__add"
-            disabled={busy}
-            onClick={() => fileRef.current && fileRef.current.click()}
-          >
-            {busy ? 'Uploading…' : 'Upload image'}
-          </button>
-          <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPick} />
-        </div>
         {error ? <p className="te-image__error">{error}</p> : null}
       </form>
     </Dialog>
