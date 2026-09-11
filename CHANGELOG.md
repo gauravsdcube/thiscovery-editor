@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.4 — 2026-09-11
+
+- Enh: Embed dialog for YouTube and Vimeo (watch, Shorts, youtu.be, Vimeo, or a pasted iframe from those sites)
+
 ## 1.4.3 — 2026-09-10
 
 - Fix: Insert image / link / table dialogs were clipped inside short form editors, hiding **Upload image** and the Insert buttons. Dialogs now open over the page.

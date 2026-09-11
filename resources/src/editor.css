@@ -243,7 +243,15 @@
 .te-rawhtml__preview { overflow: auto; }
 .te-rawhtml__preview table { width: 100%; border-collapse: collapse; }
 .te-rawhtml__preview td, .te-rawhtml__preview th { border: 1px solid #d0d5dd; padding: .4rem .55rem; }
-.te-rawhtml__preview iframe { max-width: 100%; }
+.te-rawhtml__preview iframe {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+  background: #111;
+}
 
 .ep-callout { border-left: 4px solid #005eb8; }
 .ep-callout--success { border-left-color: #007f3b; }

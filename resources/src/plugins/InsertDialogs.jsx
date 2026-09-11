@@ -13,6 +13,8 @@ import { $findMatchingParent } from '@lexical/utils';
 import { useEditorUi } from '../EditorUi.jsx';
 import { $restoreRange, normalizeUrl } from '../rangeSelection.js';
 import { $createImageNode, $isImageNode } from '../nodes/ImageNode.jsx';
+import { $createRawHtmlNode } from '../nodes/RawHtmlNode.jsx';
+import { iframeHtml } from '../embedUrl.js';
 import { uploadImageFile } from '../upload.js';
 import Dialog from '../ui/Dialog.jsx';
 
@@ -273,6 +275,76 @@ function ImageDialog({ dialog, onClose }) {
   );
 }
 
+function EmbedDialog({ dialog, onClose }) {
+  const [editor] = useLexicalComposerContext();
+  const [error, setError] = useState('');
+  const [values, set] = useDialogForm(dialog, {
+    url: '',
+    title: '',
+  });
+
+  const apply = () => {
+    const html = iframeHtml(values.url, values.title);
+    if (!html) {
+      setError('Paste a YouTube or Vimeo URL, or an embed iframe from those sites.');
+      return;
+    }
+    editor.update(() => {
+      $restoreRange();
+      $insertNodes([$createRawHtmlNode(html)]);
+    });
+    onClose();
+  };
+
+  return (
+    <Dialog
+      title="Insert video"
+      onClose={onClose}
+      footer={
+        <>
+          <button type="button" className="te-tb te-tb--wide" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="button" className="te-tb te-tb--wide is-active" onClick={apply}>
+            Insert
+          </button>
+        </>
+      }
+    >
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          apply();
+        }}
+      >
+        <label htmlFor="te-embed-url">YouTube or Vimeo URL</label>
+        <input
+          id="te-embed-url"
+          type="text"
+          value={values.url}
+          onChange={(e) => {
+            set('url', e.target.value);
+            if (error) {
+              setError('');
+            }
+          }}
+          placeholder="https://www.youtube.com/watch?v=… or paste an iframe"
+        />
+        <p className="te-image__hint">Watch, Shorts, youtu.be, and Vimeo links are converted to a player. Other sites are not allowed.</p>
+        <label htmlFor="te-embed-title">Title</label>
+        <input
+          id="te-embed-title"
+          type="text"
+          value={values.title}
+          onChange={(e) => set('title', e.target.value)}
+          placeholder="Optional — used as the iframe title"
+        />
+        {error ? <p className="te-image__error">{error}</p> : null}
+      </form>
+    </Dialog>
+  );
+}
+
 function TableDialog({ dialog, onClose }) {
   const [editor] = useLexicalComposerContext();
   const [values, set] = useDialogForm(dialog, {
@@ -357,6 +429,9 @@ export default function InsertDialogs() {
   }
   if (dialog.type === 'image') {
     return <ImageDialog dialog={dialog} onClose={close} />;
+  }
+  if (dialog.type === 'embed') {
+    return <EmbedDialog dialog={dialog} onClose={close} />;
   }
   if (dialog.type === 'table') {
     return <TableDialog dialog={dialog} onClose={close} />;

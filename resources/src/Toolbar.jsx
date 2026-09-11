@@ -217,6 +217,12 @@ export const icons = {
       <path fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" d="m2.8 12.2 3.4-3.3 2.2 2.1 2.1-2.4 2.7 3.6" />
     </Icon>
   ),
+  embed: (
+    <Icon>
+      <rect x="1.5" y="3.5" width="13" height="9" rx="1.2" fill="none" stroke="currentColor" strokeWidth="1.4" />
+      <path fill="currentColor" d="M6.4 6.2 10.2 8l-3.8 1.8z" />
+    </Icon>
+  ),
   table: (
     <Icon>
       <rect x="2" y="3" width="12" height="10" rx="1" fill="none" stroke="currentColor" strokeWidth="1.4" />
@@ -649,6 +655,13 @@ export default function Toolbar({ profile, htmlMode, onToggleHtml }) {
     });
   }, [editor, open]);
 
+  const insertEmbed = useCallback(() => {
+    editor.getEditorState().read(() => {
+      $captureRange();
+    });
+    open('embed');
+  }, [editor, open]);
+
   const insertTable = useCallback(() => {
     editor.getEditorState().read(() => {
       $captureRange();
@@ -1047,6 +1060,9 @@ export default function Toolbar({ profile, htmlMode, onToggleHtml }) {
         </ToolbarButton>
         <ToolbarButton title="Insert image" disabled={disabled} onClick={insertImage}>
           {icons.image}
+        </ToolbarButton>
+        <ToolbarButton title="Insert YouTube or Vimeo" disabled={disabled} onClick={insertEmbed}>
+          {icons.embed}
         </ToolbarButton>
         <ToolbarButton title="Insert table" disabled={disabled} onClick={insertTable}>
           {icons.table}

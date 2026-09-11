@@ -6,7 +6,7 @@ function RawHtmlView({ nodeKey, html }) {
   return (
     <div className="te-rawhtml te-deco">
       <div className="te-deco__bar">
-        <span>HTML</span>
+        <span>{/<(iframe|video)\b/i.test(html || '') ? 'Video' : 'HTML'}</span>
         <button
           type="button"
           className="te-deco__remove"
