@@ -1,6 +1,6 @@
 # Thiscovery Editor
 
-**Version 1.4.4**  
+**Version 1.4.5**  
 **Copyright (c) 2026 D Cube Consulting Ltd. All rights reserved.**  
 **License:** [AGPL-3.0-or-later](LICENSE)
 

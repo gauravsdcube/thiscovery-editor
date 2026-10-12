@@ -53,7 +53,7 @@ class EditorHtml
             return '';
         }
         if (self::looksLikeHtml($content)) {
-            return self::rewriteSurveyLinks(self::purify($content));
+            return self::closeAccordions(self::rewriteSurveyLinks(self::purify($content)));
         }
 
         try {
@@ -71,7 +71,7 @@ class EditorHtml
         return HtmlPurifier::process($html, static function ($config): void {
             /* @var \HTMLPurifier_Config $config */
             $config->set('HTML.DefinitionID', 'thiscovery-editor');
-            $config->set('HTML.DefinitionRev', 6);
+            $config->set('HTML.DefinitionRev', 8);
             $config->set('HTML.Attr.Name.UseCDATA', true);
             $config->set('Attr.AllowedFrameTargets', ['_blank']);
             $config->set('Attr.EnableID', true);
@@ -85,6 +85,21 @@ class EditorHtml
             $definition = $config->maybeGetRawHTMLDefinition();
             if ($definition === null) {
                 return;
+            }
+
+            // HTML Purifier does not know these HTML5 elements. addAttribute alone
+            // leaves them blank, so the tags are removed and only the text remains.
+            if (!isset($definition->info['section'])) {
+                $definition->addElement('section', 'Block', 'Flow', 'Common');
+            }
+            if (!isset($definition->info['aside'])) {
+                $definition->addElement('aside', 'Block', 'Flow', 'Common');
+            }
+            if (!isset($definition->info['details'])) {
+                $definition->addElement('details', 'Block', 'Flow', 'Common');
+            }
+            if (!isset($definition->info['summary'])) {
+                $definition->addElement('summary', 'Block', 'Inline', 'Common');
             }
 
             $definition->addAttribute('iframe', 'allowfullscreen', 'Bool');
@@ -117,6 +132,7 @@ class EditorHtml
             $definition->addAttribute('strong', 'class', 'Text');
             $definition->addAttribute('details', 'class', 'Text');
             $definition->addAttribute('details', 'open', 'Bool');
+            $definition->addAttribute('details', 'data-te-item', 'Text');
             $definition->addAttribute('summary', 'data-te-field', 'Text');
             $definition->addAttribute('summary', 'class', 'Text');
             $definition->addAttribute('a', 'data-te-field', 'Text');
@@ -145,6 +161,39 @@ class EditorHtml
             $definition->addAttribute('pre', 'data-language', 'Text');
             $definition->addAttribute('pre', 'data-highlight-language', 'Text');
         });
+    }
+
+    /**
+     * Accordion rows start closed. Older saved HTML opened the first row.
+     */
+    private static function closeAccordions(string $html): string
+    {
+        if ($html === '' || !str_contains($html, 'accordion')) {
+            return $html;
+        }
+
+        $dom = new \DOMDocument();
+        $prev = libxml_use_internal_errors(true);
+        $dom->loadHTML('<?xml encoding="utf-8"><div id="te-wrap">' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+        libxml_use_internal_errors($prev);
+
+        $xpath = new \DOMXPath($dom);
+        foreach ($xpath->query('//*[@data-te-node="accordion"]//details | //details[contains(@class,"ep-accordion__item")]') as $details) {
+            if ($details instanceof \DOMElement && $details->hasAttribute('open')) {
+                $details->removeAttribute('open');
+            }
+        }
+
+        $wrap = $dom->getElementById('te-wrap');
+        if ($wrap === null) {
+            return $html;
+        }
+        $out = '';
+        foreach ($wrap->childNodes as $child) {
+            $out .= $dom->saveHTML($child);
+        }
+        return $out !== '' ? $out : $html;
     }
 
     /**

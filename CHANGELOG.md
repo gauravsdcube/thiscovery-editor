@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.5 — 2026-10-12
+
+- Fix: An accordion in a rich text box is kept as an accordion. Every row starts closed.
+
 ## 1.4.4 — 2026-09-11
 
 - Enh: Embed dialog for YouTube and Vimeo (watch, Shorts, youtu.be, Vimeo, or a pasted iframe from those sites)

@@ -112,13 +112,10 @@ export class AccordionNode extends DecoratorNode {
     section.className = 'ep-accordion';
     const list = document.createElement('div');
     list.className = 'ep-accordion__list';
-    (this.__items || []).forEach((item, i) => {
+    (this.__items || []).forEach((item) => {
       const details = document.createElement('details');
       details.className = 'ep-accordion__item';
       details.setAttribute('data-te-item', '1');
-      if (i === 0) {
-        details.setAttribute('open', '');
-      }
       const summary = document.createElement('summary');
       summary.className = 'ep-accordion__summary';
       summary.setAttribute('data-te-field', 'heading');
